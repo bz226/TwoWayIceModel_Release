@@ -1,0 +1,43 @@
+1                          number of phases (nph)                         
+1.0  0.0                   relative vol. fract. of phases (wph(i)) -- NOT USED         
+*INFORMATION ABOUT PHASE #1                                               
+16384                      number of grains to read in filetext           
+* name and path of texture file (filetext)                                
+make.out 
+* name and path of single crystal file (filecrys)                         
+ice3d.sx
+1.0       FACT_BOUND factor of CRSS for special fourier points                                                                
+*INFORMATION ABOUT TEST CONDITIONS                                        
+1.  1.  1.                      RVE dimensions (delt)                     
+* boundary conditions
+    1       1       1           iudot     |    flag for vel.grad.
+    1       1       1                     |    (0:unknown-1:known)
+    1       1       1                     |
+                                          |
+    0.      1e-9     0.                 udot     |    vel.grad
+    1e-9      0.        0.                   |
+    0.      0.        0.                   |
+                                          |
+    0       0        0           iscau    |    flag for Cauchy
+            0        0                    |
+                     0                    |
+                                          |
+    0.      0.       0.          scauchy  |    Cauchy stress
+            0.       0.                   |
+                     0.                   @
+* other                                                                   
+1e5      eqincr (if ictrl>=0) or tdot (if ictrl=-1)                
+-1              ictrl (1-6: strain comp, 0: VM eq, -1: tdot)              
+*INFORMATION ABOUT RUN CONDITIONS                                         
+1             nsteps                                                     
+0.000000001    err                                                        
+400            itmax                                                      
+0              IRECOVER read grain states from STRESS.IN  (1) or not (0)? 
+1.0  99.0      xlfac0 (dum if irecover=1),xlfac1 (dum if irecover=0)      
+0              ISAVE write grain states in  STRESS.OUT (1) or not (0)?    
+0              IWRITEG write G*.OUT files (1) or not (0)                  
+1              IUPDATE update tex & RVE dim and write TEX.OUT (1) or not
+*additional parameters to estimate dislocation 
+0.1            
+4.5e-10                
+

@@ -1,0 +1,88 @@
+# v4.1
+# This is the config file for the gbm_pp process.
+# First line are the number of phases in the microstructure
+# Next section are the phase properties.
+# Next section are the phase boundary properties.
+# Last is the Phase Tracking.
+# Values are spaced by spaces, not tabs.
+#########################################################
+#####            Use # for comments!!               #####
+#########################################################
+######  First phase numner --> Number of phases.   ######
+#########################################################
+
+1 2
+
+#########################################################
+######             PHASE PROPERTIES                ######
+# A) Phase Number
+# B) Cluster Diffusion (y/n)
+#    The largest phase shouldn't use cluster diffusion.
+#    However every other phase has to!
+# C) Ostwald Ripening / Ficks Diffusion
+#    not yet implemented.
+# D) Kappa for Ficks diffusion ? Might become parameter for Ostwald Ripening
+# E) Stored energy (energy of dislocations)
+#    for ice: Core energy dislocations Gb**2/2, 3500 (MPa) *4.52e-10 (m)**2 /2; Jm-1 
+# F) Dislocation Density scaling within phases (y/n)
+#    turn dislocation density calculation on or off for a phase (1/0)
+#    turning it off means essentially dislocations are not used in the energy calculation for that phase.
+# G) Dislocation Density scaling along phase boundaries (0 ..... 1)
+#########################################################
+
+1 0 0 2e-9 3.6e-10 1 0
+2 1 0 2e-9 0       0 0
+
+#########################################################
+######         PHASE BOUNDARY PROPERTIES           ######
+# Boundaries are defined by A and B
+# A) Phase Number one
+# B) Phase Number two 
+# C) Mobility of these boundary segments
+#    below -10ºC 7.5e-5 (Duval Book - Creep and Fracture of Ice)
+#    above -10ºC 1.0e-4 (P. Duval and O. Castelnau, Dynamic Recrystallization of Ice in Polar Ice Sheets - J. Phys. IV, 1995)
+#    (2.3 m4/s·J or m2/Kg·s Nasello et al. 2005 Intrinsic Mobility Mo; 2nd stage of groove movement- fast)
+# D) Surface Energy of these segments (Jm-2)
+# E) GB Activation Energy (Q) (J mol-1)
+# mobil = mobility * exp( -(Q ) / ( R * T ) );
+#########################################################
+
+1 1 0.023  0.065  51.1e3
+1 2 0.0023 0.52   51.1e3
+2 2 2.3   0.0032 51.1e3
+
+#########################################################
+######               MELT TRACKING                 ######
+# A) Use the Unode layer to track the given phase.
+#    ( -1 --> do Diffusion shifting )
+#    ( -2 --> do nothing )
+#
+#########################################################
+
+-2
+
+#########################################################
+######               VERBOSE STUFF                 ######
+# A) print energies for given node (-1 = don't)
+#########################################################
+-1
+
+#########################################################
+######              CLUSTER_TRACKING               ######
+#########################################################
+# The cluster tracking multiplier energy function is 
+# defined by these values...
+# area_percentage = (area_new) / (area_old)
+# area_multiplier = A * (area_percentage -1) ^ D + B * (area_percentage - 1) + C
+#
+# A B C D
+#########################################################
+0.1 0 0 2
+
+#########################################################
+######              TROUBLESHOOTING                ######
+# A) How many Tjs required for TripleSwitching
+#    ( Checked for all Flynns neighbouring a Tj )
+#########################################################
+
+1
