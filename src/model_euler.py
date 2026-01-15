@@ -9,7 +9,6 @@ Email: liuwj@stanford.edu
 import torch
 import numpy as np
 import torch.nn as nn
-import torch.nn.functional as F
 from utilities3_grain import *
 
 
@@ -42,20 +41,20 @@ class SpectralConv2d_fast(nn.Module):
 
         self.scale = (1/(self.in_channels*self.out_channels*1000)) 
         self.weights1 = nn.Parameter(self.scale * torch.rand(in_channels, out_channels, \
-                                                             self.modes1, self.modes2, dtype=torch.complex64))
+                                                             self.modes1, self.modes2, dtype=torch.cfloat))
         self.weights2 = nn.Parameter(self.scale * torch.rand(in_channels, out_channels, \
-                                                             self.modes1, self.modes2, dtype=torch.complex64))
+                                                             self.modes1, self.modes2, dtype=torch.cfloat))
 
         self.weights3 = nn.Parameter(self.scale * torch.rand(in_channels, out_channels, \
-                                                             self.modes1, self.modes2, dtype=torch.complex64))
+                                                             self.modes1, self.modes2, dtype=torch.cfloat))
         self.weights4 = nn.Parameter(self.scale * torch.rand(in_channels, out_channels, \
-                                                             self.modes1, self.modes2, dtype=torch.complex64))
+                                                             self.modes1, self.modes2, dtype=torch.cfloat))
 
     # Complex multiplication
     def compl_mul2d(self, input, weights):
         """ (batch, in_channel, x, y), (in_channel, out_channel, x, y) -> (batch, out_channel, x, y) """
         return torch.einsum("bixy,ioxy->boxy", input, weights)  # Regular 4D case
-            # return torch.einsum("bixy,ioxy->boxy", input, weights)
+        # return torch.einsum("bixy,ioxy->boxy", input, weights)
         
     def forward(self, x):
         """ Multiply relevant Fourier modes and return to physical space
@@ -67,9 +66,9 @@ class SpectralConv2d_fast(nn.Module):
 
         # Multiply relevant Fourier modes
         out_ft_x = torch.zeros(batchsize, self.out_channels,  x.size(-2), x.size(-1)//2 + 1, \
-                             dtype=torch.complex64, device=x.device)
+                             dtype=torch.cfloat, device=x.device)
         out_ft_z = torch.zeros(batchsize, self.out_channels,  x.size(-2), x.size(-1)//2 + 1, \
-                             dtype=torch.complex64, device=x.device)
+                             dtype=torch.cfloat, device=x.device)
         out_ft_x[:, :, :self.modes1, :self.modes2]  = self.compl_mul2d(x_ft_x[:, :, :self.modes1, :self.modes2], self.weights1)
         out_ft_x[:, :, -self.modes1:, :self.modes2] = self.compl_mul2d(x_ft_x[:, :, -self.modes1:, :self.modes2], self.weights2)
 
@@ -98,6 +97,7 @@ class FNO2d(nn.Module):
             number of fourier modes (freq) in x and y direction when doing FFT
         width: int
             number of channels in hidden layers in NN
+        
         """
 
         super(FNO2d, self).__init__()
@@ -113,7 +113,8 @@ class FNO2d(nn.Module):
         # [input x (distribution of grain size) * num_known_step , num x cells, C1* num_known_step, C2* num_known_step, C3* num_known_step]
         # how to commpute: # = 4 * num_known_step + 2 (2 is 2D grid, 3 if 3D, 1 if 1D)
         self.fc0 = nn.Linear(4 * step_known + 2, self.width)
-        
+        # input channel is 12: the solution of the previous 10 timesteps + 2 locations (u(t-10, x, y), ..., u(t-1, x, y),  x, y)
+
         if activation_func == 'sig':
             self.activation = nn.Sigmoid()
         elif activation_func == 'relu':
@@ -147,14 +148,6 @@ class FNO2d(nn.Module):
         self.bn5 = torch.nn.BatchNorm2d(self.width)
         self.bn6 = torch.nn.BatchNorm2d(self.width)
 
-        # self.bn0 = torch.nn.InstanceNorm2d(self.width, affine=True, track_running_stats=False)
-        # self.bn1 = torch.nn.InstanceNorm2d(self.width, affine=True, track_running_stats=False)
-        # self.bn2 = torch.nn.InstanceNorm2d(self.width, affine=True, track_running_stats=False)
-        # self.bn3 = torch.nn.InstanceNorm2d(self.width, affine=True, track_running_stats=False)
-        # self.bn4 = torch.nn.InstanceNorm2d(self.width, affine=True, track_running_stats=False)
-        # self.bn5 = torch.nn.InstanceNorm2d(self.width, affine=True, track_running_stats=False)
-        # self.bn6 = torch.nn.InstanceNorm2d(self.width, affine=True, track_running_stats=False)
-
         self.fc1 = nn.Linear(self.width,128)
         self.fc2 = nn.Linear(128,1)
 
@@ -169,11 +162,18 @@ class FNO2d(nn.Module):
     
     def forward(self, x , C1, C2, C3):
         """ The forward propagation of neural network
+
+        Parameters:
+        ----------
+        x: the solution of the previous timesteps + 2 locations (u(t-10, x, y), ..., u(t-1, x, y),  x, y)
+
+        C1, C2, C3: the concentration of the three species
         """
 
         batchsize = x.shape[0]
         
         size_x, size_y,num_know_steps = x.shape[1], x.shape[2], x.shape[3]
+        # print("C1 shape: ",C1.shape,", x shape: ", x.shape,", batch size: ",batchsize,", size_x: ",size_x,", size_y: ",size_y)
         C1 = torch.reshape(C1,[batchsize,num_know_steps,size_x,size_y])
         C2 = torch.reshape(C2,[batchsize,num_know_steps,size_x,size_y])
         C3 = torch.reshape(C3,[batchsize,num_know_steps,size_x,size_y])
@@ -191,7 +191,7 @@ class FNO2d(nn.Module):
         # x after concatenation: [num batch, num x cells, num y cells, 6] 6 is [x, grid x, grid y, c1, c2, c3]
         x = torch.cat((x, grid, C1, C2,C3), dim=-1) # concatenant the x y coordinates into training data
         
-        # del grid, C1, C2,C3
+        del grid, C1, C2,C3
         x = self.fc0(x)
         # after fc0, x has shape [num batch, num x cells, num y cells, num width (set in train)]
         x = x.permute(0, 3, 1, 2) # [num batch, num width (set in train), num x cells, num y cells]
@@ -216,27 +216,13 @@ class FNO2d(nn.Module):
         x      = self.bn3(xw_3 + x3 + z3 + x)
         x = self.activation(x)
 
-        # x4, z4 = self.conv4(x)
-        # xw_4   = self.w4(x)
-        # x      = self.bn4(xw_4 + x4 + z4 + x)
-        # x = self.activation(x)
-
-        # x5, z5 = self.conv5(x)
-        # xw_5   = self.w5(x)
-        # x      = self.bn5(xw_5 + x5 + z5 + x)
-        # x = self.activation(x)
-
-        # x6, z6 = self.conv6(x)
-        # xw_6   = self.w6(x)
-        # x      = self.bn6(xw_6 + x6 + z6 + x)
-        # x = self.activation(x)
-
         x = x.permute(0, 2, 3, 1)
         x = self.fc1(x)
         x = self.activation(x)
 
         x = self.fc2(x)
         x = self.activation(x)
+
         return x
 
     def get_grid(self, batchsize, size_x, size_y, device):

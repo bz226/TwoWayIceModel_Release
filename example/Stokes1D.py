@@ -4,13 +4,12 @@ import argparse
 
 import sys
 sys.path.append('../src/')
-data_path = '/oak/stanford/groups/jsuckale/liuwj/elle_grainsize_results/data_for_FNO_training/train_data/'
 
 import torch
 print(torch.__version__)
 print(torch.version.cuda)
 print(torch.cuda.is_available())
-from model_grain import FNO2d
+from model_euler import FNO2d
 from model_grain_kde import FNO1d
 from utilities3_grain import log_normalize, reference_normalize
 from utilities3_euler import euler_to_orientation_tensor
@@ -267,18 +266,12 @@ def saveResults2NPZ(Vxe, P, T, epsxz, etav, d, grain_kde, zv,
 @torch.no_grad()
 def ice_column1D(grain_model_epoch,grain_model_path,euler_model_epoch,euler_model_path,save_data_path):
     # Constants
-    grain_model_path = './../model/jcp_syn_surfaceSpeed18_grain_kde_smooth1_N9_epoch'
-    grain_model_epoch = 1000
-    euler_model_path = './../model/jcp_syn_euler1_mode12_width16_tanh+L2_custom_N64_epoch'
-    euler_model_epoch = 500
-    
-    # Constants
     S2Y = 3600 * 24 * 365.25
     S2D = 3600 * 24
     PI = np.pi
     
     # Parameters
-    MULTISCALE = True
+    MULTISCALE = False
     ADVECT = True
     H = 1000.0
     alpha = 0.8
@@ -296,10 +289,10 @@ def ice_column1D(grain_model_epoch,grain_model_path,euler_model_epoch,euler_mode
     c = 3.0
     nz = 63
     tol = 1e-10
-    iterMax = 1e2+1
+    iterMax = 1e5+1
     nout = iterMax - 1
     dz = H / nz
-    damp = 0.5 #1.0 - 0.1 / nz
+    damp = 0.4 #1.0 - 0.1 / nz
     dtaudT  = 1 / (1/(dz**2 / kappa * rho * cp)/4.1 + 1/dt)
         
     # Move to GPU if available
@@ -442,7 +435,7 @@ def ice_column1D(grain_model_epoch,grain_model_path,euler_model_epoch,euler_mode
             Tii2 = taoxz**2
             Fx = np.diff(taoxz) / dz - rho * g * np.sin(alpha_rad)
             dVxdtau = 0.5 * dVxdtau + 0.5 * (Fx + dVxdtau * damp)
-            dtauVx = 1.8*dz**2 / (0.5 * (etav[:-1] + etav[1:]))
+            dtauVx = 1*dz**2 / (0.5 * (etav[:-1] + etav[1:]))
             Vxe[1:-1] += dtauVx * dVxdtau
             # temperature equation
             qzT = kappa * np.diff(np.diff(T) / dz)/dz
@@ -459,8 +452,8 @@ def ice_column1D(grain_model_epoch,grain_model_path,euler_model_epoch,euler_mode
             errT_values[time_step,iter] = np.linalg.norm(dTdtau)/nz
             if iter % nout == 0:
                 iteration_time = time.time() - start_time
-                print(f"time_step={time_step}, iter={iter}, err={err:.2e}, errd={errd:.2e}"
-                        f"velocity={Vxe.max()*S2Y:.2e} m/yr, strain_rate={epsxz[0]:.2e} 1/s, viscosity={etav[0]:.2e} PaS, tau={taoxz[0]:.2e} Pa,"
+                print(f"time_step={time_step}, iter={iter}, err={err:.2e}, errd={errd:.2e},"
+                        f"velocity={Vxe.max()*S2Y:.2e} m/yr, strain_rate={epsxz[0]:.2e} 1/s, viscosity={etav[0]:.2e} PaS, tau={taoxz[0]:.5e},{taoxz[1]:.5e} Pa,"
                         f"grain_size_range=[{d.min():.1f}, {d.max():.1f}] mm, time used={iteration_time/60:.3e} min")
                 start_time = time.time()
             iter += 1
