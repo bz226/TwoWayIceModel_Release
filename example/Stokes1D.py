@@ -537,9 +537,9 @@ def ice_column1D(grain_model_epoch,grain_model_path,euler_model_epoch,euler_mode
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Stokes 1D model for synthetic kde')
     parser.add_argument('--grain_model_epoch', type=int, default=1000, help='number of epoch')
-    parser.add_argument('--grain_model_path', type=str, default='./../model/jcp_syn_surfaceSpeed18_grain_kde_smooth1_N9_epoch', help='Path to trained grain kde model')
+    parser.add_argument('--grain_model_path', type=str, default='./../model/grain_kde_epoch', help='Path to trained grain kde model')
     parser.add_argument('--euler_model_epoch', type=int, default=500, help='number of epoch')
-    parser.add_argument('--euler_model_path', type=str, default='./../model/jcp_syn_surfaceSpeed1.5_euler_2_smooth0.1_N2_epoch', help='Path to trained euler model')
+    parser.add_argument('--euler_model_path', type=str, default='./../model/euler2_epoch', help='Path to trained euler model')
     parser.add_argument('--save_data_path', type=str, default='./../results/', help='Path to saved train data')
     args = parser.parse_args()
 
