@@ -14,6 +14,28 @@ from utilities3_grain import count_params, LpLoss
 from utilities3_grain import smoothness_loss, log_normalize_np, reference_normalize_np, smoothness_loss
 from utilities3_grain import mem_needed_bytes, human
 
+
+def configure_locale():
+    """Set a UTF-8 locale for multiprocessing workers if the shell env is incomplete."""
+    if not os.environ.get("LANG"):
+        os.environ["LANG"] = "en_US.UTF-8"
+    if not os.environ.get("LC_CTYPE"):
+        os.environ["LC_CTYPE"] = os.environ["LANG"]
+
+
+def build_dataloader(dataset, batch_size, shuffle, num_workers):
+    loader_kwargs = dict(
+        dataset=dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        drop_last=True,
+        num_workers=num_workers,
+        pin_memory=torch.cuda.is_available(),
+    )
+    if num_workers > 0:
+        loader_kwargs["persistent_workers"] = True
+    return torch.utils.data.DataLoader(**loader_kwargs)
+
 class H5Dataset(Dataset):
     """
     PyTorch Dataset that reads samples from an HDF5 file on-the-fly.
@@ -127,7 +149,7 @@ def save_train_data_h5(save_file_name,grid_size,step_known,step_predict,train_in
 
 def load_data(which_euler,data_path,save_traindata_path,H_ref_bound,S_ref_bound,
               grid_size=1000,step_known=1, step_predict=1, step_size = 24,
-              batch_size = 2, shuffle=True):
+              batch_size = 2, shuffle=True, num_workers=0):
     
     """ Load the data from the given paths and split into train, validation and test sets
 
@@ -229,15 +251,16 @@ def load_data(which_euler,data_path,save_traindata_path,H_ref_bound,S_ref_bound,
     print("------------------------------------------------------")
     
     # stop if the normalized data is outside of [-1,1]
-    if(np.min(euler_known)<-1 or np.max(euler_known)>1):
+    epsilon = 1e-5
+    if(np.min(euler_known)<-1-epsilon or np.max(euler_known)>1+epsilon):
         raise ValueError(f"euler_known is outside [-1,1]. min = {np.min(euler_known)} max = {np.max(euler_known)}.Check reference min and max used to normalize the data.")
-    elif(np.min(euler_predict)<-1 or np.max(euler_predict)>1):
+    elif(np.min(euler_predict)<-1-epsilon or np.max(euler_predict)>1+epsilon):
         raise ValueError(f"euler_predict is outside [-1,1]. min = {np.min(euler_predict)} max = {np.max(euler_predict)}.Check reference min and max used to normalize the data.")
-    elif(np.min(strain_rate)<-1 or np.max(strain_rate)>1):
+    elif(np.min(strain_rate)<-1-epsilon or np.max(strain_rate)>1+epsilon):
         raise ValueError(f"strainrate is outside [-1,1]. min = {np.min(strain_rate)} max = {np.max(strain_rate)}.Check reference min and max used to normalize the data.")
-    elif(np.min(pressure)<-1 or np.max(pressure)>1):
+    elif(np.min(pressure)<-1-epsilon or np.max(pressure)>1+epsilon):
         raise ValueError(f"pressure is outside [-1,1]. min = {np.min(pressure)} max = {np.max(pressure)}.Check reference min and max used to normalize the data.")
-    elif(np.min(temperature)<-1 or np.max(temperature)>1):
+    elif(np.min(temperature)<-1-epsilon or np.max(temperature)>1+epsilon):
         raise ValueError(f"temperature is outside [-1,1]. min = {np.min(temperature)} max = {np.max(temperature)}.Check reference min and max used to normalize the data.")
     
     # split the data into training, validation and test sets in the ratio 80:10:10 randomly
@@ -309,20 +332,8 @@ def load_data(which_euler,data_path,save_traindata_path,H_ref_bound,S_ref_bound,
     for name in ["euler_known", "euler_predict", "strain_rate", "temperature", "pressure"]:
         summarize_hdf5_dataset(save_traindata_path+'euler_valid_data.h5', name, chunk_size=512)
     
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset,
-        batch_size=batch_size,
-        shuffle=shuffle,
-        drop_last=True,
-        num_workers=2  # > 0 to parallelize data loading
-    )
-    valid_loader = torch.utils.data.DataLoader(
-        valid_dataset,
-        batch_size=batch_size,
-        shuffle=shuffle,
-        drop_last=True,
-        num_workers=2
-    )
+    train_loader = build_dataloader(train_dataset, batch_size, shuffle, num_workers)
+    valid_loader = build_dataloader(valid_dataset, batch_size, shuffle, num_workers)
     return train_loader, valid_loader, len(euler_files)
 
 
@@ -411,9 +422,11 @@ def train(model, train_loader, valid_loader, optimizer,
     return train_loss, test_loss
 
 
-def main(which_euler,data_path, save_path,save_traindata_path,model_dimension, epochs_input):
+def main(which_euler,data_path, save_path,save_traindata_path,model_dimension, epochs_input, num_workers):
     """ Train the model using the given data
     """
+    configure_locale()
+
     # use clip only if training loss is wild
     GRAD_CLIP = False
     BATCH_AVERAGE = True
@@ -446,11 +459,12 @@ def main(which_euler,data_path, save_path,save_traindata_path,model_dimension, e
     # define the device for training (only on one GPU if available)
     print(torch.cuda.is_available())
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(f"DataLoader num_workers: {num_workers}")
     
     
     train_loader, valid_loader, num_npz_files = load_data(which_euler,data_path,save_traindata_path,H_ref_bound,S_ref_bound,
                                                       grid_size, step_known, step_predict, 
-                                                      step_size,batch_size,True)
+                                                      step_size,batch_size,True,num_workers)
     
     # define the model
     print("-----------------------------------------------------------------")
@@ -487,6 +501,7 @@ if __name__ == "__main__":
     parser.add_argument('--model_dimension',type=int,default=128,help='Number of grid points in x or y. Currently only support square matrix.')
     parser.add_argument('--epochs',type=int,default=20,help='Num of epochs')
     parser.add_argument('--which_euler',type=str,default='euler1',help='Which euler angle to train.')
+    parser.add_argument('--num_workers', type=int, default=0, help='Number of DataLoader worker processes')
     args = parser.parse_args()
 
-    main(args.which_euler,args.data_path,args.save_path,args.save_traindata_path,args.model_dimension,args.epochs)
+    main(args.which_euler,args.data_path,args.save_path,args.save_traindata_path,args.model_dimension,args.epochs,args.num_workers)

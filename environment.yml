@@ -1,0 +1,11 @@
+name: twoway-ice
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9.16
+  - numpy=1.24.3
+  - h5py=3.7.0
+  - pytorch=2.0.1
+  - pip

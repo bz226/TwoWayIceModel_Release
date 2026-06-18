@@ -1,0 +1,31 @@
+{
+  "label": "Euler-1 reduced-data benchmark",
+  "args": {
+    "train_h5": "data/euler1_clean/euler1_train_clean.h5",
+    "valid_h5": "data/euler1_clean/euler1_valid_clean.h5",
+    "test_h5": "data/euler1_clean/euler1_test_clean.h5",
+    "models": "persistence,resnet_cnn,fno",
+    "epochs": 1,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "seeds": [
+      12345
+    ],
+    "output_dir": "results/euler1_comparison_smoke",
+    "device": "auto",
+    "num_workers": 0,
+    "patience": 20,
+    "grad_clip": 10.0,
+    "selection_metric": "valid_rmse",
+    "preload": true,
+    "cnn_width": 32,
+    "cnn_blocks": 4,
+    "fno_modes": 12,
+    "fno_width": 16
+  },
+  "delta_step_min_train": 9.0,
+  "delta_step_max_train": 67.0,
+  "train_samples": 411,
+  "valid_samples": 52,
+  "test_samples": 55
+}

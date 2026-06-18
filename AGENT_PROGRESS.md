@@ -1,0 +1,70 @@
+# Agent Progress
+
+## Current Progress
+
+- Read and adopted `euler1_surrogate_benchmark_agent_instructions.md` as the active workflow for the Euler-1 reduced-data benchmark.
+- Added `example/compare_euler_surrogates.py`, a standalone toy benchmark for the reviewer-requested surrogate comparison.
+- The script reads the small archived Euler-1 HDF5 split from `Archive (1)`:
+  - `euler1_train_data.h5`
+  - `euler1_valid_data.h5`
+  - `euler1_test_data.h5`
+- Implemented comparisons for:
+  - `persistence`: no-training baseline that copies the known Euler field.
+  - `linear_pointwise`: per-pixel linear model without spatial context.
+  - `pointwise_mlp`: per-pixel MLP without spatial context.
+  - `tiny_cnn`: local CNN without global Fourier modes.
+  - `fno`: existing Fourier neural operator architecture from `src/model_euler.py`.
+- The benchmark writes `summary.csv`, `summary.json`, and `history.csv` under `results/euler1_surrogate_comparison` by default.
+- Updated the dataset loader to preload the small archive HDF5 splits by default, avoiding repeated HDF5 opens during training.
+- Added flushed progress output so long CPU FNO runs show epoch-by-epoch status promptly.
+- Verified the script with `python -m py_compile example/compare_euler_surrogates.py`.
+- Ran a complete 2-epoch toy comparison on the full archived split and saved:
+  - `results/euler1_surrogate_comparison/summary.csv`
+  - `results/euler1_surrogate_comparison/summary.json`
+  - `results/euler1_surrogate_comparison/history.csv`
+- Corrected FNO parameter reporting to count complex spectral weights as two real-valued degrees of freedom.
+- Current 2-epoch test RMSE ranking:
+  - FNO: `0.19748204`
+  - Tiny CNN: `0.24669175`
+  - Persistence: `0.26943717`
+  - Linear pointwise: `0.657768`
+- Local-vs-HPC assessment: the archived Euler-1 toy comparison is small enough for a local PC; HPC is only needed for longer manuscript-grade sweeps, multiple random seeds, all Euler angles, larger datasets, or faster GPU training.
+- Added the instruction-required project structure:
+  - `scripts/inspect_euler1_h5.py`
+  - `scripts/prepare_clean_euler1_splits.py`
+  - `scripts/compare_euler1_surrogates.py`
+  - `src/euler1_data.py`
+  - `src/euler1_models.py`
+  - `src/euler1_metrics.py`
+- Raw HDF5 inspection was run on the local archive files and written to `results/euler1_comparison/data_report_raw.json`.
+  - Status: `FAIL`, as expected for raw data.
+  - Main issues: source-file leakage across raw splits, 9 zero/nonpositive-offset rows, contradictory labels before cleaning, and raw test split of only 11 samples.
+- Clean source-file-grouped split was generated under `data/euler1_clean/`.
+  - Train: 411 samples, 58 source files.
+  - Validation: 52 samples, 8 source files.
+  - Test: 55 samples, 7 source files.
+  - Removed 9 nonpositive-offset rows.
+  - Clean report: `data/euler1_clean/clean_split_report.json`.
+- Clean split inspection was written to `results/euler1_comparison/data_report_clean.json`.
+  - Status: `PASS`.
+  - No source-file overlap, no source-global-index overlap, no zero/negative offsets, no contradictory input-target pairs, and finite required arrays.
+- Added reviewer-facing models for the cleaned benchmark:
+  - `PersistenceBaseline`.
+  - `ResNetCNNSurrogate` with 4 residual blocks.
+  - `FNO2dSurrogate` with explicit 7-channel input and exactly 4 active spectral blocks.
+- Ran a one-seed, one-epoch smoke comparison on the cleaned split and wrote outputs under `results/euler1_comparison_smoke/`.
+  - This verifies the pipeline and required artifacts, but is not a reviewer-ready 3-seed result.
+- Added `environment_euler1_benchmark.yml` for the Euler-1 benchmark run.
+- Built a local conda environment named `twoway-euler1-benchmark` by cloning the existing `twoway-ice` environment.
+  - Verified packages inside the env: Python 3.9.16, NumPy 1.24.3, h5py 3.7.0, PyTorch 2.0.1, Matplotlib 3.7.1.
+  - Verified the new environment can compile the Euler-1 benchmark modules/scripts.
+  - Verified clean-split inspection passes inside the new environment and wrote `results/euler1_comparison/data_report_clean_envcheck.json`.
+- Added a repo-level `.gitignore` excluding `*.h5` and `*.pth` artifacts.
+
+## What To Do Next
+
+- For manuscript/rebuttal numbers, run `scripts/compare_euler1_surrogates.py` on the cleaned split with at least 3 seeds and enough epochs for fair convergence.
+- Use `results/euler1_comparison/data_report_raw.json` and `results/euler1_comparison/data_report_clean.json` as data-cleaning evidence.
+- Use the cleaned-split outputs only; do not report final reviewer-facing results from the raw leaky split or the one-epoch smoke run.
+- Activate the local run environment with `conda activate twoway-euler1-benchmark` before running benchmark scripts.
+- Existing tracked `.h5` or `.pth` files, if any, will remain tracked until explicitly removed from git tracking.

@@ -1,0 +1,896 @@
+{
+  "label": "Euler-1 reduced-data benchmark",
+  "splits": [
+    {
+      "split_name": "train",
+      "path": "data/euler1_clean/euler1_train_clean.h5",
+      "dataset_names": [
+        "euler1_known",
+        "euler1_predict",
+        "known_step_1based",
+        "predict_step_1based",
+        "pressure",
+        "source_S_value",
+        "source_file",
+        "source_file_index",
+        "source_global_index",
+        "source_step_sequence_1based",
+        "strain_rate",
+        "temperature"
+      ],
+      "datasets": {
+        "euler1_known": {
+          "shape": [
+            411,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 6733824,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -0.9999991655349731,
+          "max": 0.9999999403953552,
+          "mean": -0.051075808703899384,
+          "std": 0.6321082711219788
+        },
+        "euler1_predict": {
+          "shape": [
+            411,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 6733824,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -0.9999991655349731,
+          "max": 0.9999999403953552,
+          "mean": -0.061027493327856064,
+          "std": 0.6369185447692871
+        },
+        "known_step_1based": {
+          "shape": [
+            411
+          ],
+          "dtype": "int32",
+          "finite_count": 411,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 1.0,
+          "max": 190.0,
+          "mean": 85.68613138686132,
+          "std": 57.7599805670572
+        },
+        "predict_step_1based": {
+          "shape": [
+            411
+          ],
+          "dtype": "int32",
+          "finite_count": 411,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 10.0,
+          "max": 200.0,
+          "mean": 113.76885644768856,
+          "std": 58.13435737122063
+        },
+        "pressure": {
+          "shape": [
+            411,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 6733824,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -0.9980006217956543,
+          "max": 0.9993578195571899,
+          "mean": 0.7805360555648804,
+          "std": 0.2870221436023712
+        },
+        "source_S_value": {
+          "shape": [
+            411
+          ],
+          "dtype": "float64",
+          "finite_count": 411,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 21.0,
+          "max": 1800000.0,
+          "mean": 598599.0900243309,
+          "std": 603469.7834470096
+        },
+        "source_file": {
+          "shape": [
+            411
+          ],
+          "dtype": "object",
+          "unique_count": 58,
+          "sample_values": [
+            "euler_1_S845646e-14_H972_T-3.0_data_train.npy.npz",
+            "euler_1_S92830e-14_H870_T-9.2_data_train.npy.npz",
+            "euler_1_S845646e-14_H972_T-3.0_data_train.npy.npz",
+            "euler_1_S12653e-14_H746_T-14.8_data_train.npy.npz",
+            "euler_1_S1240387e-14_H988_T-1.9_data_train.npy.npz"
+          ]
+        },
+        "source_file_index": {
+          "shape": [
+            411
+          ],
+          "dtype": "int32",
+          "finite_count": 411,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 0.0,
+          "max": 72.0,
+          "mean": 31.58880778588808,
+          "std": 21.762571304210347
+        },
+        "source_global_index": {
+          "shape": [
+            411
+          ],
+          "dtype": "int64",
+          "finite_count": 411,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 0.0,
+          "max": 526.0,
+          "mean": 240.1970802919708,
+          "std": 147.1710281418256
+        },
+        "source_step_sequence_1based": {
+          "shape": [
+            411
+          ],
+          "dtype": "object",
+          "unique_count": 6,
+          "sample_values": [
+            "1,10,20,30,40,50,60,70,80,90,100,100,120,130,140,150,160,170,180,190,200",
+            "1,40,80,120,160,200",
+            "1,10,20,30,40,50,60,70,80,90,100,100,120,130,140,150,160,170,180,190,200",
+            "1,50,100,150,200",
+            "1,10,20,30,40,50,60,70,80,90,100,100,120,130,140,150,160,170,180,190,200"
+          ]
+        },
+        "strain_rate": {
+          "shape": [
+            411,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 6733824,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -1.0,
+          "max": 1.0,
+          "mean": 0.6199223399162292,
+          "std": 0.3465975821018219
+        },
+        "temperature": {
+          "shape": [
+            411,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 6733824,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -1.0,
+          "max": 1.0,
+          "mean": 0.5229001641273499,
+          "std": 0.4411174952983856
+        }
+      },
+      "attributes": {
+        "delta_step_max": 67,
+        "delta_step_min": 9,
+        "removed_zero_or_negative_offset_count": 9,
+        "sample_count": 411,
+        "source_file_count": 58,
+        "split_method": "source_file_grouped_logS_stratified",
+        "split_name": "train",
+        "split_seed": 12345
+      },
+      "checks": {
+        "required_arrays_exist": true,
+        "required_metadata_exist": true,
+        "missing_required_arrays": [],
+        "missing_required_metadata": [],
+        "sample_count": 411,
+        "unique_source_file_count": 58,
+        "unique_source_global_index_count": 411,
+        "known_step_range": [
+          1,
+          190
+        ],
+        "predict_step_range": [
+          10,
+          200
+        ],
+        "offset_distribution": {
+          "9": 8,
+          "10": 136,
+          "19": 4,
+          "20": 44,
+          "32": 14,
+          "33": 56,
+          "35": 14,
+          "39": 16,
+          "40": 64,
+          "49": 7,
+          "50": 21,
+          "66": 18,
+          "67": 9
+        },
+        "zero_offset_count": 0,
+        "negative_offset_count": 0,
+        "zero_or_negative_offset_count": 0,
+        "duplicate_exact_group_count": 0,
+        "duplicate_exact_extra_row_count": 0,
+        "contradictory_input_group_count": 0,
+        "contradictory_input_row_count": 0,
+        "contradictory_input_examples": [],
+        "required_arrays_all_finite": true
+      }
+    },
+    {
+      "split_name": "valid",
+      "path": "data/euler1_clean/euler1_valid_clean.h5",
+      "dataset_names": [
+        "euler1_known",
+        "euler1_predict",
+        "known_step_1based",
+        "predict_step_1based",
+        "pressure",
+        "source_S_value",
+        "source_file",
+        "source_file_index",
+        "source_global_index",
+        "source_step_sequence_1based",
+        "strain_rate",
+        "temperature"
+      ],
+      "datasets": {
+        "euler1_known": {
+          "shape": [
+            52,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 851968,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -0.9999987483024597,
+          "max": 0.9999984502792358,
+          "mean": -0.023415563628077507,
+          "std": 0.6276779770851135
+        },
+        "euler1_predict": {
+          "shape": [
+            52,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 851968,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -0.9999987483024597,
+          "max": 0.9999984502792358,
+          "mean": -0.03304315730929375,
+          "std": 0.6333344578742981
+        },
+        "known_step_1based": {
+          "shape": [
+            52
+          ],
+          "dtype": "int32",
+          "finite_count": 52,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 1.0,
+          "max": 180.0,
+          "mean": 84.78846153846153,
+          "std": 57.11336114001748
+        },
+        "predict_step_1based": {
+          "shape": [
+            52
+          ],
+          "dtype": "int32",
+          "finite_count": 52,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 20.0,
+          "max": 200.0,
+          "mean": 115.40384615384616,
+          "std": 57.329432505136026
+        },
+        "pressure": {
+          "shape": [
+            52,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 851968,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 0.23760247230529785,
+          "max": 0.9353781938552856,
+          "mean": 0.7572051286697388,
+          "std": 0.196551114320755
+        },
+        "source_S_value": {
+          "shape": [
+            52
+          ],
+          "dtype": "float64",
+          "finite_count": 52,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 6062.0,
+          "max": 763437.0,
+          "mean": 337214.3846153846,
+          "std": 287227.9312202147
+        },
+        "source_file": {
+          "shape": [
+            52
+          ],
+          "dtype": "object",
+          "unique_count": 8,
+          "sample_values": [
+            "euler_1_S22562e-14_H792_T-12.9_data_train.npy.npz",
+            "euler_1_S763437e-14_H968_T-3.3_data_train.npy.npz",
+            "euler_1_S763437e-14_H968_T-3.3_data_train.npy.npz",
+            "euler_1_S763437e-14_H968_T-3.3_data_train.npy.npz",
+            "euler_1_S487010e-14_H949_T-4.6_data_train.npy.npz"
+          ]
+        },
+        "source_file_index": {
+          "shape": [
+            52
+          ],
+          "dtype": "int32",
+          "finite_count": 52,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 16.0,
+          "max": 66.0,
+          "mean": 49.44230769230769,
+          "std": 13.431325986345476
+        },
+        "source_global_index": {
+          "shape": [
+            52
+          ],
+          "dtype": "int64",
+          "finite_count": 52,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 132.0,
+          "max": 468.0,
+          "mean": 355.78846153846155,
+          "std": 86.65211980594535
+        },
+        "source_step_sequence_1based": {
+          "shape": [
+            52
+          ],
+          "dtype": "object",
+          "unique_count": 4,
+          "sample_values": [
+            "1,40,80,120,160,200",
+            "1,20,40,60,80,100,120,140,160,180,200",
+            "1,20,40,60,80,100,120,140,160,180,200",
+            "1,20,40,60,80,100,120,140,160,180,200",
+            "1,20,40,60,80,100,120,140,160,180,200"
+          ]
+        },
+        "strain_rate": {
+          "shape": [
+            52,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 851968,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -0.0024855732917785645,
+          "max": 0.8489781618118286,
+          "mean": 0.5509459972381592,
+          "std": 0.29177287220954895
+        },
+        "temperature": {
+          "shape": [
+            52,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 851968,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -0.4160000681877136,
+          "max": 0.8160001039505005,
+          "mean": 0.43169257044792175,
+          "std": 0.381498247385025
+        }
+      },
+      "attributes": {
+        "delta_step_max": 67,
+        "delta_step_min": 19,
+        "removed_zero_or_negative_offset_count": 9,
+        "sample_count": 52,
+        "source_file_count": 8,
+        "split_method": "source_file_grouped_logS_stratified",
+        "split_name": "valid",
+        "split_seed": 12345
+      },
+      "checks": {
+        "required_arrays_exist": true,
+        "required_metadata_exist": true,
+        "missing_required_arrays": [],
+        "missing_required_metadata": [],
+        "sample_count": 52,
+        "unique_source_file_count": 8,
+        "unique_source_global_index_count": 52,
+        "known_step_range": [
+          1,
+          180
+        ],
+        "predict_step_range": [
+          20,
+          200
+        ],
+        "offset_distribution": {
+          "19": 3,
+          "20": 27,
+          "39": 3,
+          "40": 12,
+          "49": 1,
+          "50": 3,
+          "66": 2,
+          "67": 1
+        },
+        "zero_offset_count": 0,
+        "negative_offset_count": 0,
+        "zero_or_negative_offset_count": 0,
+        "duplicate_exact_group_count": 0,
+        "duplicate_exact_extra_row_count": 0,
+        "contradictory_input_group_count": 0,
+        "contradictory_input_row_count": 0,
+        "contradictory_input_examples": [],
+        "required_arrays_all_finite": true
+      }
+    },
+    {
+      "split_name": "test",
+      "path": "data/euler1_clean/euler1_test_clean.h5",
+      "dataset_names": [
+        "euler1_known",
+        "euler1_predict",
+        "known_step_1based",
+        "predict_step_1based",
+        "pressure",
+        "source_S_value",
+        "source_file",
+        "source_file_index",
+        "source_global_index",
+        "source_step_sequence_1based",
+        "strain_rate",
+        "temperature"
+      ],
+      "datasets": {
+        "euler1_known": {
+          "shape": [
+            55,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 901120,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -0.9999972581863403,
+          "max": 0.9999979734420776,
+          "mean": -0.03533494099974632,
+          "std": 0.6328893899917603
+        },
+        "euler1_predict": {
+          "shape": [
+            55,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 901120,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -0.9999972581863403,
+          "max": 0.9999979734420776,
+          "mean": -0.04370437189936638,
+          "std": 0.6385597586631775
+        },
+        "known_step_1based": {
+          "shape": [
+            55
+          ],
+          "dtype": "int32",
+          "finite_count": 55,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 1.0,
+          "max": 190.0,
+          "mean": 87.03636363636363,
+          "std": 57.69101509889123
+        },
+        "predict_step_1based": {
+          "shape": [
+            55
+          ],
+          "dtype": "int32",
+          "finite_count": 55,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 10.0,
+          "max": 200.0,
+          "mean": 112.36363636363636,
+          "std": 58.04116521490701
+        },
+        "pressure": {
+          "shape": [
+            55,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 901120,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 0.5035170316696167,
+          "max": 0.9513731002807617,
+          "mean": 0.8237774968147278,
+          "std": 0.14464432001113892
+        },
+        "source_S_value": {
+          "shape": [
+            55
+          ],
+          "dtype": "float64",
+          "finite_count": 55,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 13209.0,
+          "max": 929557.0,
+          "mean": 478937.7090909091,
+          "std": 376456.24660605035
+        },
+        "source_file": {
+          "shape": [
+            55
+          ],
+          "dtype": "object",
+          "unique_count": 7,
+          "sample_values": [
+            "euler_1_S108287e-14_H878_T-8.8_data_train.npy.npz",
+            "euler_1_S287913e-14_H925_T-6.1_data_train.npy.npz",
+            "euler_1_S108287e-14_H878_T-8.8_data_train.npy.npz",
+            "euler_1_S287913e-14_H925_T-6.1_data_train.npy.npz",
+            "euler_1_S29431e-14_H807_T-12.3_data_train.npy.npz"
+          ]
+        },
+        "source_file_index": {
+          "shape": [
+            55
+          ],
+          "dtype": "int32",
+          "finite_count": 55,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 1.0,
+          "max": 71.0,
+          "mean": 48.85454545454545,
+          "std": 23.504288337406305
+        },
+        "source_global_index": {
+          "shape": [
+            55
+          ],
+          "dtype": "int64",
+          "finite_count": 55,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 20.0,
+          "max": 521.0,
+          "mean": 356.1090909090909,
+          "std": 163.17393650249113
+        },
+        "source_step_sequence_1based": {
+          "shape": [
+            55
+          ],
+          "dtype": "object",
+          "unique_count": 5,
+          "sample_values": [
+            "1,33,66,99,132,165,200",
+            "1,33,66,99,132,165,200",
+            "1,33,66,99,132,165,200",
+            "1,33,66,99,132,165,200",
+            "1,40,80,120,160,200"
+          ]
+        },
+        "strain_rate": {
+          "shape": [
+            55,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 901120,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": 0.13465261459350586,
+          "max": 0.8836432695388794,
+          "mean": 0.6494414806365967,
+          "std": 0.25312772393226624
+        },
+        "temperature": {
+          "shape": [
+            55,
+            128,
+            128,
+            1
+          ],
+          "dtype": "float32",
+          "finite_count": 901120,
+          "nan_count": 0,
+          "posinf_count": 0,
+          "neginf_count": 0,
+          "all_finite": true,
+          "min": -0.07999998331069946,
+          "max": 0.8639999628067017,
+          "mean": 0.5633450150489807,
+          "std": 0.3202206790447235
+        }
+      },
+      "attributes": {
+        "delta_step_max": 50,
+        "delta_step_min": 9,
+        "removed_zero_or_negative_offset_count": 9,
+        "sample_count": 55,
+        "source_file_count": 7,
+        "split_method": "source_file_grouped_logS_stratified",
+        "split_name": "test",
+        "split_seed": 12345
+      },
+      "checks": {
+        "required_arrays_exist": true,
+        "required_metadata_exist": true,
+        "missing_required_arrays": [],
+        "missing_required_metadata": [],
+        "sample_count": 55,
+        "unique_source_file_count": 7,
+        "unique_source_global_index_count": 55,
+        "known_step_range": [
+          1,
+          190
+        ],
+        "predict_step_range": [
+          10,
+          200
+        ],
+        "offset_distribution": {
+          "9": 1,
+          "10": 17,
+          "19": 1,
+          "20": 10,
+          "32": 2,
+          "33": 8,
+          "35": 2,
+          "39": 2,
+          "40": 8,
+          "49": 1,
+          "50": 3
+        },
+        "zero_offset_count": 0,
+        "negative_offset_count": 0,
+        "zero_or_negative_offset_count": 0,
+        "duplicate_exact_group_count": 0,
+        "duplicate_exact_extra_row_count": 0,
+        "contradictory_input_group_count": 0,
+        "contradictory_input_row_count": 0,
+        "contradictory_input_examples": [],
+        "required_arrays_all_finite": true
+      }
+    }
+  ],
+  "overlap": {
+    "source_file_overlap": {
+      "train__valid": {
+        "count": 0,
+        "examples": []
+      },
+      "train__test": {
+        "count": 0,
+        "examples": []
+      },
+      "valid__test": {
+        "count": 0,
+        "examples": []
+      }
+    },
+    "source_global_index_overlap": {
+      "train__valid": {
+        "count": 0,
+        "examples": []
+      },
+      "train__test": {
+        "count": 0,
+        "examples": []
+      },
+      "valid__test": {
+        "count": 0,
+        "examples": []
+      }
+    }
+  },
+  "combined_checks": {
+    "sample_count": 518,
+    "unique_source_file_count": 73,
+    "unique_source_global_index_count": 518,
+    "known_step_range": [
+      1,
+      190
+    ],
+    "predict_step_range": [
+      10,
+      200
+    ],
+    "offset_distribution": {
+      "9": 9,
+      "10": 153,
+      "19": 8,
+      "20": 81,
+      "32": 16,
+      "33": 64,
+      "35": 16,
+      "39": 21,
+      "40": 84,
+      "49": 9,
+      "50": 27,
+      "66": 20,
+      "67": 10
+    },
+    "zero_offset_count": 0,
+    "negative_offset_count": 0,
+    "zero_or_negative_offset_count": 0,
+    "duplicate_exact_group_count": 0,
+    "duplicate_exact_extra_row_count": 0,
+    "contradictory_input_group_count": 0,
+    "contradictory_input_row_count": 0,
+    "contradictory_input_examples": []
+  },
+  "status": {
+    "overall_status": "PASS",
+    "checks": [
+      {
+        "name": "Required arrays exist",
+        "status": "PASS",
+        "message": "missing arrays=[], missing metadata=[]"
+      },
+      {
+        "name": "Required arrays are finite",
+        "status": "PASS",
+        "message": "all required numeric arrays are finite"
+      },
+      {
+        "name": "Source-file leakage across splits",
+        "status": "PASS",
+        "message": "0 pairwise source_file overlaps"
+      },
+      {
+        "name": "Source-global-index leakage across splits",
+        "status": "PASS",
+        "message": "0 pairwise source_global_index overlaps"
+      },
+      {
+        "name": "Zero or negative offset rows",
+        "status": "PASS",
+        "message": "0 rows have predict_step_1based <= known_step_1based"
+      },
+      {
+        "name": "Contradictory labels",
+        "status": "PASS",
+        "message": "0 input groups have more than one target"
+      },
+      {
+        "name": "Test set size",
+        "status": "PASS",
+        "message": "test split has 55 samples"
+      }
+    ]
+  }
+}

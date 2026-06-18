@@ -1,0 +1,153 @@
+{
+  "args": {
+    "archive_dir": "Archive (1)",
+    "output_dir": "results/euler1_surrogate_comparison",
+    "models": "persistence,linear_pointwise,tiny_cnn,fno",
+    "epochs": 2,
+    "batch_size": 8,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0,
+    "seed": 12345,
+    "device": "auto",
+    "num_workers": 0,
+    "no_preload": false,
+    "activation": "tanh",
+    "max_train_samples": null,
+    "max_valid_samples": null,
+    "max_test_samples": null,
+    "mlp_hidden": 64,
+    "mlp_layers": 3,
+    "cnn_channels": 16,
+    "cnn_layers": 3,
+    "cnn_kernel": 3,
+    "fno_modes": 12,
+    "fno_width": 16,
+    "save_models": false
+  },
+  "archive_dir": "/Users/bobby/Documents/GitHub/TwoWayIceModel_Release/Archive (1)",
+  "output_dir": "/Users/bobby/Documents/GitHub/TwoWayIceModel_Release/results/euler1_surrogate_comparison",
+  "device": "cpu",
+  "preload": true,
+  "split_sizes": {
+    "train": 474,
+    "valid": 42,
+    "test": 11,
+    "train_full": 474,
+    "valid_full": 42,
+    "test_full": 11
+  },
+  "results": [
+    {
+      "model": "persistence",
+      "parameters": 0,
+      "train_seconds": 3.5000000000451337e-06,
+      "metrics": {
+        "train": {
+          "mse": 0.08338193733732409,
+          "rmse": 0.288759306927628,
+          "mae": 0.07744590680307477,
+          "relative_l2": 0.4510224985017065,
+          "circular_rmse_deg": 31.97566238161099
+        },
+        "valid": {
+          "mse": 0.101801108391512,
+          "rmse": 0.3190628596241061,
+          "mae": 0.09415884741715022,
+          "relative_l2": 0.5027990433004358,
+          "circular_rmse_deg": 35.3296858521856
+        },
+        "test": {
+          "mse": 0.07259638742967085,
+          "rmse": 0.26943716786974814,
+          "mae": 0.06994916634126143,
+          "relative_l2": 0.4264723978349371,
+          "circular_rmse_deg": 30.747125905101452
+        }
+      }
+    },
+    {
+      "model": "linear_pointwise",
+      "parameters": 7,
+      "train_seconds": 0.4406105,
+      "metrics": {
+        "train": {
+          "mse": 0.44732962580169805,
+          "rmse": 0.6688270522352532,
+          "mae": 0.5930067290736654,
+          "relative_l2": 1.0446626041681402,
+          "circular_rmse_deg": 115.2989326574114
+        },
+        "valid": {
+          "mse": 0.43906462760198683,
+          "rmse": 0.6626195194845884,
+          "mae": 0.5861465590340751,
+          "relative_l2": 1.044196936182271,
+          "circular_rmse_deg": 114.27157324491107
+        },
+        "test": {
+          "mse": 0.43265874819322064,
+          "rmse": 0.6577680048415403,
+          "mae": 0.5808529962192882,
+          "relative_l2": 1.0411328936603272,
+          "circular_rmse_deg": 113.5620145107861
+        }
+      }
+    },
+    {
+      "model": "tiny_cnn",
+      "parameters": 3345,
+      "train_seconds": 19.505165375,
+      "metrics": {
+        "train": {
+          "mse": 0.06901048777727135,
+          "rmse": 0.2626984731156071,
+          "mae": 0.14730745679718532,
+          "relative_l2": 0.410317241068983,
+          "circular_rmse_deg": 40.42916440676711
+        },
+        "valid": {
+          "mse": 0.07936511579014006,
+          "rmse": 0.2817181495575677,
+          "mae": 0.1569184334505172,
+          "relative_l2": 0.44394893296196186,
+          "circular_rmse_deg": 42.53086466679925
+        },
+        "test": {
+          "mse": 0.060856821862134064,
+          "rmse": 0.24669175475101324,
+          "mae": 0.14296277544715189,
+          "relative_l2": 0.39047034604235575,
+          "circular_rmse_deg": 39.57736570496892
+        }
+      }
+    },
+    {
+      "model": "fno",
+      "parameters": 2068929,
+      "train_seconds": 95.260260709,
+      "metrics": {
+        "train": {
+          "mse": 0.04749346661228168,
+          "rmse": 0.2179299580422152,
+          "mae": 0.11467249933551635,
+          "relative_l2": 0.3403918486333734,
+          "circular_rmse_deg": 34.50256746596025
+        },
+        "valid": {
+          "mse": 0.05372700556403115,
+          "rmse": 0.23179086600647392,
+          "mae": 0.11990639425459362,
+          "relative_l2": 0.3652704229227355,
+          "circular_rmse_deg": 36.099407173507025
+        },
+        "test": {
+          "mse": 0.038999157873066986,
+          "rmse": 0.1974820444320622,
+          "mae": 0.10560597614808516,
+          "relative_l2": 0.3125798926857829,
+          "circular_rmse_deg": 32.6369919437366
+        }
+      }
+    }
+  ]
+}
