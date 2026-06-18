@@ -27,8 +27,11 @@ from torch.utils.data import DataLoader
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SRC_DIR = PROJECT_ROOT / "src"
+SCRIPTS_DIR = PROJECT_ROOT / "scripts"
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
 
 from euler1_data import Euler1H5Dataset, batch_to_model_tensors, delta_bounds_from_h5  # noqa: E402
 from euler1_metrics import (  # noqa: E402
@@ -39,6 +42,7 @@ from euler1_metrics import (  # noqa: E402
     trainable_parameter_count,
 )
 from euler1_models import build_model  # noqa: E402
+from plot_euler1_prediction_maps import save_prediction_map_plot  # noqa: E402
 
 
 def parse_models(text: str) -> list[str]:
@@ -230,28 +234,6 @@ def save_bar_plot(rows: list[dict[str, Any]], metric: str, ylabel: str, out_path
     ax.bar(models, means, yerr=stds, capsize=4, color=["#777777", "#4C78A8", "#F58518"][: len(models)])
     ax.set_title("Euler-1 reduced-data benchmark")
     ax.set_ylabel(ylabel)
-    fig.tight_layout()
-    fig.savefig(out_path, dpi=200)
-    plt.close(fig)
-
-
-def save_prediction_map_plot(predictions: dict[str, np.ndarray], target: np.ndarray, out_path: Path) -> None:
-    if not predictions:
-        return
-    models = list(predictions)
-    fig, axes = plt.subplots(len(models), 3, figsize=(9, 3 * len(models)), squeeze=False)
-    target_map = target[0, 0]
-    for row_idx, model in enumerate(models):
-        pred_map = predictions[model][0, 0]
-        error_map = pred_map - target_map
-        images = [target_map, pred_map, error_map]
-        titles = [f"{model}: target", f"{model}: prediction", f"{model}: error"]
-        for col_idx, (image, title) in enumerate(zip(images, titles)):
-            im = axes[row_idx, col_idx].imshow(image, cmap="coolwarm", vmin=-1, vmax=1)
-            axes[row_idx, col_idx].set_title(title)
-            axes[row_idx, col_idx].axis("off")
-            fig.colorbar(im, ax=axes[row_idx, col_idx], fraction=0.046, pad=0.04)
-    fig.suptitle("Euler-1 reduced-data benchmark sample maps")
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
     plt.close(fig)
@@ -487,7 +469,12 @@ def main() -> None:
         for model_name, pred in sampled_predictions.items():
             npz_payload[f"{model_name}_prediction"] = pred
         np.savez(output_dir / "test_predictions_sampled.npz", **npz_payload)
-        save_prediction_map_plot(sampled_predictions, sampled_target, output_dir / "test_prediction_maps.png")
+        save_prediction_map_plot(
+            sampled_predictions,
+            sampled_known,
+            sampled_target,
+            output_dir / "test_prediction_maps.png",
+        )
 
     if scatter_target is not None:
         save_scatter_plot(scatter_predictions, scatter_target, output_dir / "test_pred_vs_true.png")

@@ -59,7 +59,7 @@
   - Verified packages inside the env: Python 3.9.16, NumPy 1.24.3, h5py 3.7.0, PyTorch 2.0.1, Matplotlib 3.7.1.
   - Verified the new environment can compile the Euler-1 benchmark modules/scripts.
   - Verified clean-split inspection passes inside the new environment and wrote `results/euler1_comparison/data_report_clean_envcheck.json`.
-- Added a repo-level `.gitignore` excluding `*.h5` and `*.pth` artifacts.
+- Added a repo-level `.gitignore` excluding `*.h5`, `*.pt`, and `*.pth` artifacts.
 - Added Sherlock Slurm batch files using `#SBATCH --partition=serc`:
   - `scripts/sherlock_prepare_euler1_data.sbatch` runs raw inspection, clean split preparation, and clean inspection.
   - `scripts/sherlock_run_euler1_comparison.sbatch` runs the full cleaned Euler-1 reduced-data benchmark.
@@ -78,15 +78,43 @@
   - `requirements_euler1_benchmark.txt` now pins binary-wheel versions and includes `--only-binary=:all:`.
   - `h5py` is pinned to `3.12.1`.
   - `scripts/sherlock_setup_euler1_venv.sbatch` installs with `--no-cache-dir` and supports `RECREATE_VENV=1` to remove a partial failed `.venv`.
+- Extracted the returned Sherlock result bundle `euler1_comparison.zip` into `results/euler1_comparison/`.
+  - Final CSVs are now available locally as `summary_mean_std.csv`, `summary_by_seed.csv`, and `history.csv`.
+  - Plots and sampled predictions are available as `test_rmse_bar.png`, `circular_rmse_bar.png`, `loss_curves.png`, `test_prediction_maps.png`, `test_pred_vs_true.png`, and `test_predictions_sampled.npz`.
+  - Checkpoints were extracted as `.pt` files and are ignored by git through `.gitignore`.
+- Added `results/euler1_comparison/reviewer_summary.md` with the cleaned-split table and interpretation for the reviewer response.
+- Added `results/euler1_comparison/model_settings_table.md` with the current shared training settings, architecture settings, parameter counts, and final test metrics.
+- Updated the prediction-map figure layout requested for the manuscript/reviewer comparison:
+  - `results/euler1_comparison/test_prediction_maps.png` is now a 3x3 grid.
+  - Rows are `Persistence`, `ResNet CNN`, and `FNO`.
+  - Columns are `Before (input)`, `Prediction`, and `Ground truth`.
+  - The plotting function now regenerates this layout for future runs.
+- Separated reusable qualitative plotting code into `scripts/plot_euler1_prediction_maps.py`.
+  - It can regenerate the 3x3 figure directly from `results/euler1_comparison/test_predictions_sampled.npz` without rerunning training.
+  - Example command: `python scripts/plot_euler1_prediction_maps.py --predictions_npz results/euler1_comparison/test_predictions_sampled.npz --output results/euler1_comparison/test_prediction_maps.png`.
+  - `scripts/compare_euler1_surrogates.py` now imports and uses the shared plotting function.
+- Final cleaned-split test metrics over 3 seeds:
+  - Persistence: RMSE `0.29755 +/- 0`, relative L2 `0.464883 +/- 0`, circular RMSE `32.8587 +/- 0`, circular MAE `9.80081 +/- 0`.
+  - ResNet CNN: RMSE `0.176992 +/- 0.0010153`, relative L2 `0.276527 +/- 0.00158628`, circular RMSE `27.3299 +/- 0.198451`, circular MAE `11.9517 +/- 0.194865`.
+  - FNO: RMSE `0.174774 +/- 0.00434005`, relative L2 `0.273062 +/- 0.00678076`, circular RMSE `26.8936 +/- 1.09549`, circular MAE `12.1977 +/- 0.843617`.
+  - FNO has the lowest mean test RMSE, relative L2, and circular RMSE; ResNet CNN has a slightly lower circular MAE.
 
 ## What To Do Next
 
-- For manuscript/rebuttal numbers, run `scripts/compare_euler1_surrogates.py` on the cleaned split with at least 3 seeds and enough epochs for fair convergence.
+- Use `results/euler1_comparison/reviewer_summary.md`, `results/euler1_comparison/model_settings_table.md`, `results/euler1_comparison/summary_mean_std.csv`, and `results/euler1_comparison/summary_by_seed.csv` for the reviewer-facing model-comparison table.
+- Use `results/euler1_comparison/test_prediction_maps.png` as the 3x3 qualitative figure showing before/input, prediction, and ground truth for each model.
+- Use `scripts/plot_euler1_prediction_maps.py` to regenerate or customize that figure independently of the training script.
 - Use `results/euler1_comparison/data_report_raw.json` and `results/euler1_comparison/data_report_clean.json` as data-cleaning evidence.
-- Use the cleaned-split outputs only; do not report final reviewer-facing results from the raw leaky split or the one-epoch smoke run.
+- Report cleaned-split outputs only; do not use the raw leaky split or the one-epoch smoke run for reviewer-facing results.
 - Activate the local run environment with `conda activate twoway-euler1-benchmark` before running benchmark scripts.
-- Existing tracked `.h5` or `.pth` files, if any, will remain tracked until explicitly removed from git tracking.
+- Existing tracked `.h5`, `.pt`, or `.pth` files, if any, will remain tracked until explicitly removed from git tracking.
 - On Sherlock, submit from the repo root with `sbatch scripts/sherlock_setup_euler1_venv.sbatch`, then `sbatch scripts/sherlock_prepare_euler1_data.sbatch`, then `sbatch scripts/sherlock_run_euler1_comparison.sbatch`.
 - Sherlock jobs should run in dependency order, not all at once: setup venv first, then prepare clean data, then run the comparison. Use Slurm `--dependency=afterok:<jobid>` to chain them automatically.
 - If a different Python 3.12 module is available on Sherlock, override with `PYTHON_MODULE=python/<version> sbatch ...`.
 - If the previous venv setup failed during `h5py`, rerun setup as `RECREATE_VENV=1 sbatch scripts/sherlock_setup_euler1_venv.sbatch`.
+- Sherlock comparison log review:
+  - The full 3-seed benchmark completed successfully and returned the final local CSVs.
+  - Best validation checkpoints from the log:
+    - Seed 12345: ResNet epoch 95, valid RMSE `0.180297`, circular RMSE `27.644`; FNO epoch 37, valid RMSE `0.179086`, circular RMSE `26.986`.
+    - Seed 23456: ResNet epoch 96, valid RMSE `0.179663`, circular RMSE `27.257`; FNO epoch 37, valid RMSE `0.180909`, circular RMSE `27.331`.
+    - Seed 34567: ResNet epoch 94, valid RMSE `0.179562`, circular RMSE `27.442`; FNO epoch 68, valid RMSE `0.177882`, circular RMSE `25.919`.
