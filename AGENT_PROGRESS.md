@@ -73,7 +73,11 @@
 - Updated Sherlock environment setup for Python 3.12:
   - `scripts/sherlock_setup_euler1_venv.sbatch` now defaults to `python/3.12.1`.
   - `scripts/sherlock_prepare_euler1_data.sbatch` and `scripts/sherlock_run_euler1_comparison.sbatch` load `python/3.12.1` before activating `.venv`.
-  - `requirements_euler1_benchmark.txt` now uses Python-3.12-compatible lower bounds: NumPy `>=1.26`, h5py `>=3.10`, Matplotlib `>=3.8`, and PyTorch CPU `2.3.1`.
+  - `requirements_euler1_benchmark.txt` now uses Python-3.12-compatible pinned binary-wheel versions.
+- Addressed Sherlock setup failure where pip tried to build `h5py` from source and failed on missing `libhdf5.so`.
+  - `requirements_euler1_benchmark.txt` now pins binary-wheel versions and includes `--only-binary=:all:`.
+  - `h5py` is pinned to `3.12.1`.
+  - `scripts/sherlock_setup_euler1_venv.sbatch` installs with `--no-cache-dir` and supports `RECREATE_VENV=1` to remove a partial failed `.venv`.
 
 ## What To Do Next
 
@@ -85,3 +89,4 @@
 - On Sherlock, submit from the repo root with `sbatch scripts/sherlock_setup_euler1_venv.sbatch`, then `sbatch scripts/sherlock_prepare_euler1_data.sbatch`, then `sbatch scripts/sherlock_run_euler1_comparison.sbatch`.
 - Sherlock jobs should run in dependency order, not all at once: setup venv first, then prepare clean data, then run the comparison. Use Slurm `--dependency=afterok:<jobid>` to chain them automatically.
 - If a different Python 3.12 module is available on Sherlock, override with `PYTHON_MODULE=python/<version> sbatch ...`.
+- If the previous venv setup failed during `h5py`, rerun setup as `RECREATE_VENV=1 sbatch scripts/sherlock_setup_euler1_venv.sbatch`.

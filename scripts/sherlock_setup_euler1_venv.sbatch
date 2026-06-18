@@ -15,6 +15,7 @@ PROJECT_DIR="${PROJECT_DIR:-$SLURM_SUBMIT_DIR}"
 PYTHON_MODULE="${PYTHON_MODULE:-python/3.12.1}"
 VENV_DIR="${VENV_DIR:-$PROJECT_DIR/.venv}"
 REQUIREMENTS_FILE="${REQUIREMENTS_FILE:-$PROJECT_DIR/requirements_euler1_benchmark.txt}"
+RECREATE_VENV="${RECREATE_VENV:-0}"
 
 cd "$PROJECT_DIR"
 
@@ -26,11 +27,17 @@ else
     echo "Warning: no module command found; using current python3." >&2
 fi
 
+if [[ "$RECREATE_VENV" == "1" && -d "$VENV_DIR" ]]; then
+    rm -rf "$VENV_DIR"
+fi
+
+python3 --version
 python3 -m venv "$VENV_DIR"
 source "$VENV_DIR/bin/activate"
 
+python --version
 python -m pip install --upgrade pip setuptools wheel
-python -m pip install -r "$REQUIREMENTS_FILE"
+python -m pip install --no-cache-dir -r "$REQUIREMENTS_FILE"
 
 python - <<'PY'
 import h5py
