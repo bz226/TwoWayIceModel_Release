@@ -17,6 +17,15 @@ OUT_DIR="${OUT_DIR:-data/euler1_clean}"
 RESULT_DIR="${RESULT_DIR:-results/euler1_comparison}"
 CONDA_ENV_NAME="${CONDA_ENV_NAME:-twoway-euler1-benchmark}"
 VENV_ACTIVATE="${VENV_ACTIVATE:-$PROJECT_DIR/.venv/bin/activate}"
+PYTHON_MODULE="${PYTHON_MODULE:-python/3.12.1}"
+
+load_python_module() {
+    if command -v ml >/dev/null 2>&1; then
+        ml "$PYTHON_MODULE"
+    elif command -v module >/dev/null 2>&1; then
+        module load "$PYTHON_MODULE"
+    fi
+}
 
 activate_python_env() {
     if [[ -n "${PY_ENV_ACTIVATE:-}" ]]; then
@@ -46,6 +55,7 @@ activate_python_env() {
 }
 
 cd "$PROJECT_DIR"
+load_python_module
 activate_python_env
 
 export PYTHONUNBUFFERED=True

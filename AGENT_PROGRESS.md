@@ -70,6 +70,10 @@
   - `scripts/sherlock_setup_euler1_venv.sbatch`
 - Updated the Sherlock prepare/run batch files to prefer `.venv/bin/activate` or `PY_ENV_ACTIVATE` before falling back to conda.
 - Added `.venv/` to `.gitignore`.
+- Updated Sherlock environment setup for Python 3.12:
+  - `scripts/sherlock_setup_euler1_venv.sbatch` now defaults to `python/3.12.1`.
+  - `scripts/sherlock_prepare_euler1_data.sbatch` and `scripts/sherlock_run_euler1_comparison.sbatch` load `python/3.12.1` before activating `.venv`.
+  - `requirements_euler1_benchmark.txt` now uses Python-3.12-compatible lower bounds: NumPy `>=1.26`, h5py `>=3.10`, Matplotlib `>=3.8`, and PyTorch CPU `2.3.1`.
 
 ## What To Do Next
 
@@ -79,3 +83,5 @@
 - Activate the local run environment with `conda activate twoway-euler1-benchmark` before running benchmark scripts.
 - Existing tracked `.h5` or `.pth` files, if any, will remain tracked until explicitly removed from git tracking.
 - On Sherlock, submit from the repo root with `sbatch scripts/sherlock_setup_euler1_venv.sbatch`, then `sbatch scripts/sherlock_prepare_euler1_data.sbatch`, then `sbatch scripts/sherlock_run_euler1_comparison.sbatch`.
+- Sherlock jobs should run in dependency order, not all at once: setup venv first, then prepare clean data, then run the comparison. Use Slurm `--dependency=afterok:<jobid>` to chain them automatically.
+- If a different Python 3.12 module is available on Sherlock, override with `PYTHON_MODULE=python/<version> sbatch ...`.
