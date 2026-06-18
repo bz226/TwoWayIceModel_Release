@@ -60,6 +60,16 @@
   - Verified the new environment can compile the Euler-1 benchmark modules/scripts.
   - Verified clean-split inspection passes inside the new environment and wrote `results/euler1_comparison/data_report_clean_envcheck.json`.
 - Added a repo-level `.gitignore` excluding `*.h5` and `*.pth` artifacts.
+- Added Sherlock Slurm batch files using `#SBATCH --partition=serc`:
+  - `scripts/sherlock_prepare_euler1_data.sbatch` runs raw inspection, clean split preparation, and clean inspection.
+  - `scripts/sherlock_run_euler1_comparison.sbatch` runs the full cleaned Euler-1 reduced-data benchmark.
+- Syntax-checked both Sherlock batch files with `bash -n`.
+- Checked Sherlock's Anaconda guidance. Sherlock recommends avoiding Anaconda on the cluster and converting conda dependencies to Python package requirements for a virtual environment.
+- Added Sherlock virtual-environment setup support:
+  - `requirements_euler1_benchmark.txt`
+  - `scripts/sherlock_setup_euler1_venv.sbatch`
+- Updated the Sherlock prepare/run batch files to prefer `.venv/bin/activate` or `PY_ENV_ACTIVATE` before falling back to conda.
+- Added `.venv/` to `.gitignore`.
 
 ## What To Do Next
 
@@ -68,3 +78,4 @@
 - Use the cleaned-split outputs only; do not report final reviewer-facing results from the raw leaky split or the one-epoch smoke run.
 - Activate the local run environment with `conda activate twoway-euler1-benchmark` before running benchmark scripts.
 - Existing tracked `.h5` or `.pth` files, if any, will remain tracked until explicitly removed from git tracking.
+- On Sherlock, submit from the repo root with `sbatch scripts/sherlock_setup_euler1_venv.sbatch`, then `sbatch scripts/sherlock_prepare_euler1_data.sbatch`, then `sbatch scripts/sherlock_run_euler1_comparison.sbatch`.
