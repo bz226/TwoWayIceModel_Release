@@ -2,3 +2,9 @@
 *.pt
 *.pth
 .venv/
+*.err
+*.out
+*.csv
+*.png
+*.json
+*.npz
