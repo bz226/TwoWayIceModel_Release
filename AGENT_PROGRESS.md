@@ -80,7 +80,7 @@
   - `scripts/sherlock_setup_euler1_venv.sbatch` installs with `--no-cache-dir` and supports `RECREATE_VENV=1` to remove a partial failed `.venv`.
 - Extracted the returned Sherlock result bundle `euler1_comparison.zip` into `results/euler1_comparison/`.
   - Final CSVs are now available locally as `summary_mean_std.csv`, `summary_by_seed.csv`, and `history.csv`.
-  - Plots and sampled predictions are available as `test_rmse_bar.png`, `circular_rmse_bar.png`, `loss_curves.png`, `test_prediction_maps.png`, `test_pred_vs_true.png`, and `test_predictions_sampled.npz`.
+  - Plots and prediction exports are available as `test_rmse_bar.png`, `circular_rmse_bar.png`, `loss_curves.png`, `test_prediction_maps.png`, `test_pred_vs_true.png`, `test_predictions_full.npz`, and `test_predictions_sampled.npz`.
   - Checkpoints were extracted as `.pt` files and are ignored by git through `.gitignore`.
 - Added `results/euler1_comparison/reviewer_summary.md` with the cleaned-split table and interpretation for the reviewer response.
 - Added `results/euler1_comparison/model_settings_table.md` with the current shared training settings, architecture settings, parameter counts, and final test metrics.
@@ -90,9 +90,25 @@
   - Columns are `Before (input)`, `Prediction`, and `Ground truth`.
   - The plotting function now regenerates this layout for future runs.
 - Separated reusable qualitative plotting code into `scripts/plot_euler1_prediction_maps.py`.
-  - It can regenerate the 3x3 figure directly from `results/euler1_comparison/test_predictions_sampled.npz` without rerunning training.
-  - Example command: `python scripts/plot_euler1_prediction_maps.py --predictions_npz results/euler1_comparison/test_predictions_sampled.npz --output results/euler1_comparison/test_prediction_maps.png`.
+  - It can regenerate the 3x3 figure directly from `results/euler1_comparison/test_predictions_full.npz` without rerunning training.
+  - Example command: `python3 scripts/plot_euler1_prediction_maps.py --predictions_npz results/euler1_comparison/test_predictions_full.npz --output results/euler1_comparison/test_prediction_maps.png --sample_index 0`.
   - `scripts/compare_euler1_surrogates.py` now imports and uses the shared plotting function.
+  - If `python scripts/plot_euler1_prediction_maps.py` raises `SyntaxError` at type annotations, the shell is using Python 2; use `python3`, the activated `.venv`, or Sherlock's loaded Python 3.12 module instead.
+  - Required local plotting data are contained in `results/euler1_comparison/test_predictions_full.npz`: `known`, `target`, `persistence_prediction`, `resnet_cnn_prediction`, and `fno_prediction`.
+  - `test_predictions_full.npz` contains all 55 cleaned test samples for seed `12345` and has arrays shaped `(55, 1, 128, 128)`.
+  - `test_predictions_sampled.npz` remains as a smaller legacy file with only the first 3 test samples.
+  - Added `scripts/export_euler1_test_predictions.py` to regenerate `test_predictions_full.npz` from saved checkpoints without retraining.
+  - Updated `scripts/compare_euler1_surrogates.py` so future benchmark runs save both `test_predictions_full.npz` and the smaller `test_predictions_sampled.npz`.
+  - Recommended local workflow: activate `.venv` before plotting or running benchmark scripts so `python`, `numpy`, and `matplotlib` resolve consistently.
+- Added `scripts/rank_euler1_change_samples.py` to rank test samples by input-to-ground-truth change.
+  - Ranking file: `results/euler1_comparison/input_target_change_ranking.csv`.
+  - Largest-change sample by circular RMSE is `sample_index=48`.
+  - Sample 48 metrics: circular RMSE `49.558` degrees, circular MAE `21.927` degrees, normalized RMSE `0.418154`, and fraction of pixels changing by more than 10 degrees `0.225`.
+  - Generated `results/euler1_comparison/test_prediction_maps_largest_change.png` using sample 48.
+- Verified model parameter/checkpoint files are stored directly in `results/euler1_comparison/`.
+  - FNO checkpoints: `best_fno.pt`, `best_fno_seed12345.pt`, `best_fno_seed23456.pt`, and `best_fno_seed34567.pt`.
+  - ResNet CNN checkpoints: `best_resnet_cnn.pt`, `best_resnet_cnn_seed12345.pt`, `best_resnet_cnn_seed23456.pt`, and `best_resnet_cnn_seed34567.pt`.
+  - Persistence has no learned checkpoint because it has zero trainable parameters.
 - Checked the merge-blocking result artifacts after `.gitignore` was updated.
   - `.gitignore` patterns match the generated `.csv`, `.png`, `.json`, and `.npz` outputs when checked with `git check-ignore --no-index`.
   - The same `results/euler1_comparison/*` output files are tracked in the current git index, so normal `.gitignore` rules do not apply to them.
@@ -107,11 +123,17 @@
 
 - Use `results/euler1_comparison/reviewer_summary.md`, `results/euler1_comparison/model_settings_table.md`, `results/euler1_comparison/summary_mean_std.csv`, and `results/euler1_comparison/summary_by_seed.csv` for the reviewer-facing model-comparison table.
 - Use `results/euler1_comparison/test_prediction_maps.png` as the 3x3 qualitative figure showing before/input, prediction, and ground truth for each model.
-- Use `scripts/plot_euler1_prediction_maps.py` to regenerate or customize that figure independently of the training script.
+- Use `python3 scripts/plot_euler1_prediction_maps.py` to regenerate or customize that figure independently of the training script.
+- Use `results/euler1_comparison/test_predictions_full.npz` for qualitative plotting across all 55 test samples; use the CSV summaries for quantitative aggregate results.
+- Regenerate the full prediction export with `python3 scripts/export_euler1_test_predictions.py --output results/euler1_comparison/test_predictions_full.npz` if needed.
+- Use `results/euler1_comparison/best_*.pt` as the saved model parameter/checkpoint files.
+- Use `results/euler1_comparison/test_prediction_maps_largest_change.png` if the qualitative figure should emphasize a case with large before/input to after/ground-truth evolution.
+- Recompute the largest-change ranking with `python3 scripts/rank_euler1_change_samples.py --predictions_npz results/euler1_comparison/test_predictions_full.npz --output_csv results/euler1_comparison/input_target_change_ranking.csv`.
+- Prefer activating `.venv` first, then running the plotting script with `python` or `python3`; this avoids accidentally invoking a system Python without the required packages.
 - Use `results/euler1_comparison/data_report_raw.json` and `results/euler1_comparison/data_report_clean.json` as data-cleaning evidence.
 - If a merge is blocked by local untracked generated result files, move or stash those local files first; `.gitignore` does not override files that are tracked by the branch being merged.
 - Report cleaned-split outputs only; do not use the raw leaky split or the one-epoch smoke run for reviewer-facing results.
-- Activate the local run environment with `conda activate twoway-euler1-benchmark` before running benchmark scripts.
+- Activate the Python virtual environment with `source .venv/bin/activate` before running benchmark scripts locally.
 - Existing tracked `.h5`, `.pt`, or `.pth` files, if any, will remain tracked until explicitly removed from git tracking.
 - On Sherlock, submit from the repo root with `sbatch scripts/sherlock_setup_euler1_venv.sbatch`, then `sbatch scripts/sherlock_prepare_euler1_data.sbatch`, then `sbatch scripts/sherlock_run_euler1_comparison.sbatch`.
 - Sherlock jobs should run in dependency order, not all at once: setup venv first, then prepare clean data, then run the comparison. Use Slurm `--dependency=afterok:<jobid>` to chain them automatically.

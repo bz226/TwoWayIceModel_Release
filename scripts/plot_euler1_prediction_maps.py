@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Plot reusable Euler-1 before / prediction / ground-truth comparison maps.
 
 Example:
-    python scripts/plot_euler1_prediction_maps.py \
-        --predictions_npz results/euler1_comparison/test_predictions_sampled.npz \
+    python3 scripts/plot_euler1_prediction_maps.py \
+        --predictions_npz results/euler1_comparison/test_predictions_full.npz \
         --output results/euler1_comparison/test_prediction_maps.png
 """
 
@@ -153,7 +153,7 @@ def save_prediction_map_plot(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Plot Euler-1 sampled prediction maps")
-    parser.add_argument("--predictions_npz", default="results/euler1_comparison/test_predictions_sampled.npz")
+    parser.add_argument("--predictions_npz", default="results/euler1_comparison/test_predictions_full.npz")
     parser.add_argument("--output", default="results/euler1_comparison/test_prediction_maps.png")
     parser.add_argument("--models", default="persistence,resnet_cnn,fno")
     parser.add_argument("--sample_index", type=int, default=0)

@@ -333,11 +333,9 @@ def main() -> None:
 
     summary_by_seed: list[dict[str, Any]] = []
     history_rows: list[dict[str, Any]] = []
-    sampled_predictions: dict[str, np.ndarray] = {}
-    sampled_target: np.ndarray | None = None
-    sampled_known: np.ndarray | None = None
-    scatter_predictions: dict[str, np.ndarray] = {}
-    scatter_target: np.ndarray | None = None
+    full_test_predictions: dict[str, np.ndarray] = {}
+    full_test_target: np.ndarray | None = None
+    full_test_known: np.ndarray | None = None
     best_global: dict[str, tuple[float, dict[str, torch.Tensor]]] = {}
 
     for seed in args.seeds:
@@ -424,21 +422,10 @@ def main() -> None:
 
         if seed == args.seeds[0]:
             for model_name, model in seed_models.items():
-                known, target, pred = collect_predictions(
-                    model,
-                    test_loader,
-                    device,
-                    delta_min,
-                    delta_max,
-                    max_samples=min(3, len(test_dataset)),
-                )
-                sampled_predictions[model_name] = pred
-                sampled_known = known if sampled_known is None else sampled_known
-                sampled_target = target if sampled_target is None else sampled_target
-
-                _, full_target, full_pred = collect_predictions(model, test_loader, device, delta_min, delta_max)
-                scatter_predictions[model_name] = full_pred
-                scatter_target = full_target if scatter_target is None else scatter_target
+                known, target, pred = collect_predictions(model, test_loader, device, delta_min, delta_max)
+                full_test_predictions[model_name] = pred
+                full_test_known = known if full_test_known is None else full_test_known
+                full_test_target = target if full_test_target is None else full_test_target
 
     for model_name in ("resnet_cnn", "fno"):
         if model_name in best_global:
@@ -461,14 +448,28 @@ def main() -> None:
     with (output_dir / "run_metadata.json").open("w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
 
-    if sampled_target is not None and sampled_known is not None:
-        npz_payload = {
+    if full_test_target is not None and full_test_known is not None:
+        full_npz_payload = {
+            "known": full_test_known,
+            "target": full_test_target,
+        }
+        for model_name, pred in full_test_predictions.items():
+            full_npz_payload[f"{model_name}_prediction"] = pred
+        np.savez(output_dir / "test_predictions_full.npz", **full_npz_payload)
+
+        sample_count = min(3, full_test_target.shape[0])
+        sampled_predictions = {
+            model_name: pred[:sample_count] for model_name, pred in full_test_predictions.items()
+        }
+        sampled_known = full_test_known[:sample_count]
+        sampled_target = full_test_target[:sample_count]
+        sampled_npz_payload = {
             "known": sampled_known,
             "target": sampled_target,
         }
         for model_name, pred in sampled_predictions.items():
-            npz_payload[f"{model_name}_prediction"] = pred
-        np.savez(output_dir / "test_predictions_sampled.npz", **npz_payload)
+            sampled_npz_payload[f"{model_name}_prediction"] = pred
+        np.savez(output_dir / "test_predictions_sampled.npz", **sampled_npz_payload)
         save_prediction_map_plot(
             sampled_predictions,
             sampled_known,
@@ -476,8 +477,8 @@ def main() -> None:
             output_dir / "test_prediction_maps.png",
         )
 
-    if scatter_target is not None:
-        save_scatter_plot(scatter_predictions, scatter_target, output_dir / "test_pred_vs_true.png")
+    if full_test_target is not None:
+        save_scatter_plot(full_test_predictions, full_test_target, output_dir / "test_pred_vs_true.png")
     save_loss_plot(history_rows, output_dir / "loss_curves.png")
     save_bar_plot(mean_std_rows, "rmse", "Test RMSE", output_dir / "test_rmse_bar.png")
     save_bar_plot(mean_std_rows, "circular_rmse_deg", "Circular RMSE (degrees)", output_dir / "circular_rmse_bar.png")
