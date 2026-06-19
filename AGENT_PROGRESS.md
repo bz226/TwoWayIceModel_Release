@@ -93,6 +93,10 @@
   - It can regenerate the 3x3 figure directly from `results/euler1_comparison/test_predictions_sampled.npz` without rerunning training.
   - Example command: `python scripts/plot_euler1_prediction_maps.py --predictions_npz results/euler1_comparison/test_predictions_sampled.npz --output results/euler1_comparison/test_prediction_maps.png`.
   - `scripts/compare_euler1_surrogates.py` now imports and uses the shared plotting function.
+- Checked the merge-blocking result artifacts after `.gitignore` was updated.
+  - `.gitignore` patterns match the generated `.csv`, `.png`, `.json`, and `.npz` outputs when checked with `git check-ignore --no-index`.
+  - The same `results/euler1_comparison/*` output files are tracked in the current git index, so normal `.gitignore` rules do not apply to them.
+  - To stop tracking those generated artifacts in a future commit, use `git rm --cached` on the selected result files after deciding which outputs should remain only local.
 - Final cleaned-split test metrics over 3 seeds:
   - Persistence: RMSE `0.29755 +/- 0`, relative L2 `0.464883 +/- 0`, circular RMSE `32.8587 +/- 0`, circular MAE `9.80081 +/- 0`.
   - ResNet CNN: RMSE `0.176992 +/- 0.0010153`, relative L2 `0.276527 +/- 0.00158628`, circular RMSE `27.3299 +/- 0.198451`, circular MAE `11.9517 +/- 0.194865`.
@@ -105,6 +109,7 @@
 - Use `results/euler1_comparison/test_prediction_maps.png` as the 3x3 qualitative figure showing before/input, prediction, and ground truth for each model.
 - Use `scripts/plot_euler1_prediction_maps.py` to regenerate or customize that figure independently of the training script.
 - Use `results/euler1_comparison/data_report_raw.json` and `results/euler1_comparison/data_report_clean.json` as data-cleaning evidence.
+- If a merge is blocked by local untracked generated result files, move or stash those local files first; `.gitignore` does not override files that are tracked by the branch being merged.
 - Report cleaned-split outputs only; do not use the raw leaky split or the one-epoch smoke run for reviewer-facing results.
 - Activate the local run environment with `conda activate twoway-euler1-benchmark` before running benchmark scripts.
 - Existing tracked `.h5`, `.pt`, or `.pth` files, if any, will remain tracked until explicitly removed from git tracking.
